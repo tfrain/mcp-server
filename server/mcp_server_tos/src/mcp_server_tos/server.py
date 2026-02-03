@@ -131,3 +131,59 @@ async def get_object(bucket: str, key: str):
         return content
     except Exception:
         raise
+
+@mcp.tool()
+async def video_info(bucket_name: str, key: str):
+    """
+    Retrieves video file information from VolcEngine TOS by calling the video/info API.
+    In the request, specify the bucket name and the full object key for the video.
+    Args:
+        bucket_name: The name of the bucket.
+        key: The key of the object (video file).
+    Returns:
+        return the video file information in json format as string.
+    """
+    try:
+        config = get_tos_config()
+        tos_resource = ObjectResource(config)
+        content = await tos_resource.video_info(bucket_name, key)
+        return content
+    except Exception:
+        raise
+
+@mcp.tool()
+async def video_snapshot(bucket_name: str, key: str, time: Optional[int] = None,
+                         width: Optional[int] = None, height: Optional[int] = None, mode: Optional[str] = None,
+                         output_format: Optional[str] = None, auto_rotate: Optional[str] = None,
+                         saveas_object: Optional[str] = None, saveas_bucket: Optional[str] = None):
+    """
+    Retrieves a video snapshot from VolcEngine TOS by calling the video/snapshot API.
+    In the request, specify the bucket name, the full object key of the video, and the snapshot parameters.
+    Args:
+        bucket_name: The name of the bucket.
+        key: The key of the object (video file).
+        time: The timestamp to capture the snapshot, in milliseconds (ms).
+        width: The snapshot width in pixels (px). If set to 0, it is calculated automatically based on the original aspect ratio.
+        height: The snapshot height in pixels (px). If set to 0, it is calculated automatically based on the original aspect ratio.
+        mode: The snapshot mode. If not specified, the default mode captures the frame precisely at the given timestamp.
+              If set to "fast", it captures the nearest keyframe before the specified timestamp.
+        output_format: The output image format. Supported values:
+            - jpg: JPEG format (default).
+            - png: PNG format.
+        auto_rotate: Whether to rotate automatically. Supported values:
+            - auto: Automatically rotates the snapshot based on video metadata after it is generated.
+            - w: Forces rotation to a landscape orientation (width > height) based on video metadata after it is generated.
+            - h: Forces rotation to a portrait orientation (height > width) based on video metadata after it is generated.
+        saveas_object: The object name to save the snapshot as. If not specified, it won’t be saved (no persistence); return the captured frame image.
+        saveas_bucket: The bucket name where the snapshot should be saved. If not specified, the current bucket will be used.
+    Returns:
+        If saveas is specified, return the saveas object information in json format; otherwise, return the snapshot image (JPG or PNG) as a base64-encoded string.
+    """
+    try:
+        config = get_tos_config()
+        tos_resource = ObjectResource(config)
+        content = await tos_resource.video_snapshot(bucket_name, key, time, width, height, mode, output_format,
+                                                    auto_rotate, saveas_object, saveas_bucket)
+        return content
+    except Exception:
+        raise
